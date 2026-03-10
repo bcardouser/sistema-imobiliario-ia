@@ -1,84 +1,79 @@
-# Sistema Imobiliário com Inteligência Artificial
+# Sistema de Gestão Imobiliária com Inteligência Artificial
 
 Projeto acadêmico da disciplina de Laboratório Avançado de Software.
 
-O objetivo deste projeto é desenvolver uma plataforma SaaS para gestão imobiliária com automação de processos e integração com Inteligência Artificial.
+O objetivo deste projeto é desenvolver uma plataforma SaaS para gestão imobiliária, com automação de processos e uso de Inteligência Artificial para facilitar a busca e organização de imóveis.
 
 ---
 
-# Estrutura do Projeto
+## Estrutura do Projeto
 
-Este repositório foi organizado para facilitar o desenvolvimento em equipe.
+O repositório foi organizado para facilitar o desenvolvimento em equipe.
 
-## backend
+### backend
+Contém o código do backend do sistema.
 
-Contém o código da API do sistema.
-
-Aqui será desenvolvido o backend em Python utilizando FastAPI.  
-Essa parte será responsável pelas regras de negócio do sistema e pela comunicação com o banco de dados.
+Aqui será desenvolvido o servidor da aplicação utilizando Python e FastAPI.  
+Essa parte será responsável por processar as regras de negócio e comunicar com o banco de dados.
 
 Arquivo principal:
-
-main.py → ponto inicial da aplicação backend.
+- **main.py** → ponto inicial da aplicação backend.
 
 ---
 
-## database
+### database
+Contém a modelagem do banco de dados.
 
-Contém o modelo do banco de dados.
+O arquivo **schema.sql** define a estrutura das tabelas utilizadas pelo sistema.
 
-O arquivo schema.sql define a estrutura das tabelas do sistema, incluindo:
-
+Principais entidades do banco:
 - imobiliárias (tenants)
 - usuários
 - imóveis
-- leads
+- leads de clientes
 
-Esse arquivo será utilizado para criar o banco de dados PostgreSQL do projeto.
+Esse arquivo será utilizado para criar o banco PostgreSQL.
 
 ---
 
-## docs
-
+### docs
 Contém a documentação técnica do projeto.
 
 Aqui ficam explicações sobre arquitetura, decisões técnicas e funcionamento do sistema.
 
 ---
 
-## requirements.txt
+### requirements.txt
+Lista das bibliotecas Python necessárias para rodar o projeto.
 
-Lista das bibliotecas Python utilizadas no projeto.
-
-Quando alguém for rodar o projeto, basta executar:
-
+Para instalar as dependências:
+```
 pip install -r requirements.txt
+```
+```
 
----
+## Arquitetura do Sistema
 
-# Arquitetura do Sistema
+O sistema segue uma arquitetura de três camadas:
 
-O sistema segue uma arquitetura de três camadas.
+**Frontend**  
+Interface do usuário (previsto para ser desenvolvido com Streamlit).
 
-Frontend  
-Interface do usuário (Streamlit).
+**Backend**  
+API desenvolvida em Python utilizando FastAPI.
 
-Backend  
-API desenvolvida em Python com FastAPI.
-
-Banco de Dados  
+**Banco de Dados**  
 PostgreSQL responsável pelo armazenamento das informações.
 
 ---
 
-# Modelo SaaS
+## Modelo do Sistema
 
-O sistema será multi-tenant.
+O sistema será desenvolvido no modelo **SaaS multi-tenant**.
 
-Isso significa que várias imobiliárias poderão usar o sistema ao mesmo tempo, mas cada uma terá seus dados isolados.
+Isso significa que várias imobiliárias poderão utilizar a mesma plataforma, mas cada uma terá seus dados isolados.
 
 Cada imobiliária poderá ter:
-
 - usuários
 - imóveis cadastrados
 - leads de clientes
