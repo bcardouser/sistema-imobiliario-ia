@@ -1,4 +1,8 @@
 fastapi
 uvicorn
-psycopg2-binary
-streamlit
+pymongo
+python-dotenv
+certifi
+pydantic
+bcrypt
+PyJWT
