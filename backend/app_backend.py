@@ -58,27 +58,3 @@ class PropertyManager:
             "created_at": datetime.now(timezone.utc)
         }
         return self.properties.insert_one(doc)
-
-# --- EXECUÇÃO ---
-if __name__ == "__main__":
-    client = MongoClient(MONGO_URI)
-    auth = LocusAuraAuth(client)
-    pm = PropertyManager(client)
-
-    print("--- Testando Fluxo Completo ---")
-    user = auth.login("gabriel@locusaura.com", "MinhaSenha123")
-    
-    if user:
-        print(f"Login de {user['name']} realizado!")
-        # Cadastrando um imóvel de teste para a Yasmin ver
-        imovel = pm.add_property(
-            user['id'], 
-            "Apartamento na Planta - Centro", 
-            "Lindo apê com varanda gourmet, aceita cachorro e permuta por carro.",
-            450000, 
-            pet=True, 
-            swap=True
-        )
-        print(f"Imóvel cadastrado com sucesso! ID: {imovel.inserted_id}")
-    else:
-        print("Usuário não encontrado. Cadastre-se primeiro.")
