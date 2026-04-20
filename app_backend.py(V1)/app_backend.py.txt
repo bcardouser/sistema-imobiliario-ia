@@ -1,0 +1,78 @@
+import os
+import bcrypt
+import jwt
+from datetime import datetime, timedelta
+from pymongo import MongoClient
+from bson import ObjectId
+
+# --- CONFIGURAÇÕES (Em produção, use .env) ---
+# Substitua pela sua string do MongoDB Atlas
+MONGO_URI = "mongodb+srv://xaviergabriel739_db_user:YTJsV4uhIDV0cah1@cluster0.uwiae5z.mongodb.net/?appName=Cluster0"
+SECRET_KEY = "locus_aura_secret_token_2026"
+
+class LocusAuraAuth:
+    def __init__(self):
+        self.client = MongoClient(MONGO_URI)
+        self.db = self.client['locus_aura_db']
+        self.users = self.db['users']
+        # Criar índice único para o email se não existir
+        self.users.create_index("email", unique=True)
+
+    # 1. SEGURANÇA: Gerar Hash da Senha (Bcrypt)
+    def _generate_hash(self, password: str) -> str:
+        salt = bcrypt.gensalt(12) # 12 rounds de segurança
+        return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+
+    # 2. SEGURANÇA: Verificar Senha
+    def _verify_password(self, password: str, hashed: str) -> bool:
+        return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+
+    # 3. SEGURANÇA: Gerar JWT
+    def generate_jwt(self, user_data: dict) -> str:
+        payload = {
+            "user_id": str(user_data["_id"]),
+            "role": user_data["role"],
+            "exp": datetime.utcnow() + timedelta(hours=2) # Expira em 2h
+        }
+        return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+    # 4. OPERAÇÃO: Cadastrar Usuário (Com LGPD)
+    def register(self, name, email, password, role="corretor"):
+        try:
+            user_doc = {
+                "full_name": name,
+                "email": email.lower(),
+                "password_hash": self._generate_hash(password),
+                "role": role,
+                "lgpd_consent": True, # Trava de segurança da Yasmin
+                "terms_version": "v1.0",
+                "created_at": datetime.utcnow()
+            }
+            result = self.users.insert_one(user_doc)
+            return {"status": "sucesso", "id": str(result.inserted_id)}
+        except Exception as e:
+            return {"status": "erro", "message": "Email já cadastrado ou erro no Atlas."}
+
+    # 5. OPERAÇÃO: Login
+    def login(self, email, password):
+        user = self.users.find_one({"email": email.lower()})
+        
+        if user and self._verify_password(password, user["password_hash"]):
+            token = self.generate_jwt(user)
+            # Atualiza o último login
+            self.users.update_one({"_id": user["_id"]}, {"$set": {"last_login": datetime.utcnow()}})
+            return {"status": "logado", "token": token, "name": user["full_name"]}
+        
+        return {"status": "erro", "message": "Credenciais inválidas."}
+
+# --- TESTE DE EXECUÇÃO ---
+if __name__ == "__main__":
+    auth = LocusAuraAuth()
+
+    print("--- Testando Cadastro ---")
+    registro = auth.register("Gabriel Xavier", "gabriel@corretora.com", "SenhaForte123")
+    print(registro)
+
+    print("\n--- Testando Login ---")
+    login_result = auth.login("gabriel@corretora.com", "SenhaForte123")
+    print(login_result)
